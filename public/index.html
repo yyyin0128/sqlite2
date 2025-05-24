@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8" />
+    <title>🍗 麥克雞塊價格查詢</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            font-family: 'Segoe UI', sans-serif;
+            background: url('images/chicken.png') repeat;
+            background-size: 1900px;
+            color: #333;
+            text-align: center;
+        }
+
+        h1 {
+            color: #d82c2c;
+            font-size: 38px;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 3px white;
+        }
+
+        .query-section {
+            margin-bottom: 30px;
+        }
+
+        input, button {
+            font-size: 18px;
+            padding: 12px 20px;
+            margin: 10px;
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            width: 220px;
+            max-width: 90%;
+            box-sizing: border-box;
+            background-color: rgba(255, 255, 255, 0.85);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #ffbc0a;
+            box-shadow: 0 0 6px #ffbc0a;
+        }
+
+        button {
+            background-color: #ffbc0a;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #f2a500;
+        }
+
+        table {
+            margin: 0 auto;
+            border-collapse: collapse;
+            width: 90%;
+            max-width: 800px;
+            font-size: 18px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 14px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #d82c2c;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #fff5e0;
+        }
+
+        @media (max-width: 600px) {
+            input, button {
+                width: 90%;
+                font-size: 16px;
+            }
+
+            table {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h1>🍗 麥克雞塊價格查詢</h1>
+
+<div class="query-section">
+    <input type="number" id="startYear" placeholder="起始年">
+    <input type="number" id="endYear" placeholder="結束年"><br>
+    <button onclick="fetchPrices()">查詢價格</button>
+</div>
+
+<table id="resultTable">
+    <thead>
+    <tr>
+        <th>年份</th>
+        <th>商品名稱</th>
+        <th>價格</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    function fetchPrices() {
+        const start = document.getElementById('startYear').value;
+        const end = document.getElementById('endYear').value;
+
+        fetch(`/api/prices?start=${start}&end=${end}`)
+            .then(res => {
+                if (!res.ok) throw new Error("查詢失敗");
+                return res.json();
+            })
+            .then(data => {
+                const tbody = document.querySelector('#resultTable tbody');
+                tbody.innerHTML = '';
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3">查無資料</td></tr>';
+                    return;
+                }
+                data.forEach(row => {
+                    tbody.innerHTML += `<tr>
+              <td>${row.years}</td>
+              <td>${row.food_name}</td>
+              <td>$${row.price}</td>
+            </tr>`;
+                });
+            })
+            .catch(err => {
+                alert('錯誤：' + err.message);
+            });
+    }
+</script>
+
+</body>
+</html>
