@@ -97,12 +97,22 @@
 
 <h1>🍗 麥克雞塊價格查詢</h1>
 
+<!-- 查詢區 -->
 <div class="query-section">
     <input type="number" id="startYear" placeholder="起始年">
     <input type="number" id="endYear" placeholder="結束年"><br>
     <button onclick="fetchPrices()">查詢價格</button>
 </div>
 
+<!-- 新增區 -->
+<div class="query-section">
+    <input type="number" id="addYear" placeholder="年份 (如 2025)">
+    <input type="text" id="addName" placeholder="商品名稱 (如 麥克雞塊6塊)">
+    <input type="number" id="addPrice" placeholder="價格 (如 68)">
+    <button onclick="addPrice()">新增資料</button>
+</div>
+
+<!-- 結果表格 -->
 <table id="resultTable">
     <thead>
     <tr>
@@ -121,27 +131,56 @@
 
         fetch(`/api/prices?start=${start}&end=${end}`)
             .then(res => {
-                if (!res.ok) throw new Error("查詢失敗");
+                if (!res.ok) throw new Error("\u67e5\u8a62\u5931\u6557");
                 return res.json();
             })
             .then(data => {
                 const tbody = document.querySelector('#resultTable tbody');
                 tbody.innerHTML = '';
                 if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="3">查無資料</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="3">\u67e5\u7121\u8cc7\u6599</td></tr>';
                     return;
                 }
                 data.forEach(row => {
                     tbody.innerHTML += `<tr>
-              <td>${row.years}</td>
-              <td>${row.food_name}</td>
-              <td>$${row.price}</td>
-            </tr>`;
+                      <td>${row.years}</td>
+                      <td>${row.food_name}</td>
+                      <td>$${row.price}</td>
+                    </tr>`;
                 });
             })
             .catch(err => {
-                alert('錯誤：' + err.message);
+                alert('\u932f\u8aa4：' + err.message);
             });
+    }
+
+    function addPrice() {
+        const years = parseInt(document.getElementById('addYear').value);
+        const food_name = document.getElementById('addName').value.trim();
+        const price = parseInt(document.getElementById('addPrice').value);
+
+        if (!years || !food_name || !price) {
+            alert('\u8acb\u8f38\u5165\u5b8c\u6574\u8cc7\u6599');
+            return;
+        }
+
+        fetch('/api/prices', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ years, food_name, price })
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('\u65b0\u589e\u5931\u6557');
+                return res.json();
+            })
+            .then(data => {
+                alert(data.message);
+                document.getElementById('addYear').value = '';
+                document.getElementById('addName').value = '';
+                document.getElementById('addPrice').value = '';
+                fetchPrices();
+            })
+            .catch(err => alert('\u932f\u8aa4：' + err.message));
     }
 </script>
 

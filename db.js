@@ -40,9 +40,6 @@ const db = new sqlite3.Database(dbPath, (err) => {
         const insertSQL = 'INSERT OR IGNORE INTO homework_price (years, food_name, price) VALUES (?, ?, ?)';
         data.forEach(row => {
             db.run(insertSQL, row, (err) => {
-                if (err) {
-                    console.error('新增資料失敗:', err.message);
-                }
             });
         });
         console.log('已批次新增 homework_price 資料。');

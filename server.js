@@ -11,7 +11,7 @@ app.use(express.static('public')); // 提供 index.html
 app.use(express.json());
 
 // 建立 SQLite 連線（放在 ./db/sqlite.db）
-const dbPath = path.join(__dirname, 'db', 'sqlite.db');
+const dbPath = path.join(__dirname, 'db', 'sqlite2.db');
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         console.error('❌ 資料庫連接失敗：', err.message);
